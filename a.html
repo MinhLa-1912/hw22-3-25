@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popular Movies</title>
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-6">Popular Movies</h1>
+        <div id="movie-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("https://api.themoviedb.org/3/movie/popular?language=en-US&page=1", {
+                headers: {
+                    Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5ZTU5NzY0OTIyMGVmMjU2ZWI3YTNlNDAzNmM5N2QwZCIsIm5iZiI6MTYyNjA3ODM3MC4wNzUsInN1YiI6IjYwZWJmY2EyOTgyNGM4MDA1ZmYzZTdiNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zHDTNuMcM_YJLRGw_TlCu5LCJXqKmxtQ4Jy-AS1Wov4",
+                },
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                const grid = document.getElementById("movie-grid");
+                grid.innerHTML = "";
+                
+                data.results.forEach((movie) => {
+                    const movieCard = document.createElement("div");
+                    movieCard.className = "bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col items-center text-center";
+                    
+                    const img = document.createElement("img");
+                    img.src = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750";
+                    img.alt = movie.title;
+                    img.className = "w-full h-80 object-cover rounded";
+                    
+                    const content = document.createElement("div");
+                    content.className = "mt-4";
+                    content.innerHTML = `
+                        <h2 class="text-lg font-semibold">${movie.title}</h2>
+                        <p class="text-gray-400">Rating: ${movie.vote_average}/10</p>
+                        <p class="text-gray-300 text-sm mt-2">${movie.overview.slice(0, 80)}...</p>
+                    `;
+                    
+                    movieCard.appendChild(img);
+                    movieCard.appendChild(content);
+                    grid.appendChild(movieCard);
+                });
+            })
+            .catch((error) => console.error("Error fetching data:", error));
+        });
+    </script>
+</body>
+</html>
